@@ -3,8 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xanthe - WhatsApp Clone</title>
+    <title>XANTHE // DIRECT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #030303;
+            --text-main: #f0f0f0;
+            --text-muted: #555555;
+            --accent: #d90429; /* Deep, dangerous crimson */
+            --border: #1a1a1a;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,520 +23,392 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #111b21;
-            color: #e9edef;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
             height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .app-container {
+        .container {
             width: 100%;
+            max-width: 800px;
             height: 100vh;
-            background-color: #111b21;
             display: flex;
             flex-direction: column;
-        }
-
-        .chat-header {
-            background-color: #202c33;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid #2a3942;
-            flex-shrink: 0;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8b0000, #ff1744);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 18px;
-            color: #fff;
             position: relative;
         }
 
-        .avatar::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 12px;
-            height: 12px;
-            background-color: #00ff88;
-            border: 2px solid #111b21;
-            border-radius: 50%;
+        /* --- Header --- */
+        header {
+            padding: 40px 30px 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
         }
 
-        .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #00ff88;
-            border-radius: 50%;
-            margin-left: 8px;
+        .brand {
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 6px;
+            color: var(--text-main);
+            text-transform: uppercase;
         }
 
-        /* FIXED: Added authentic WhatsApp Dark Doodle pattern with proper blending */
-        .chat-body {
+        .status-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .pulse {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent);
+            animation: breathe 2s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.4; box-shadow: 0 0 4px var(--accent); }
+            50% { opacity: 1; box-shadow: 0 0 12px var(--accent); }
+        }
+
+        /* --- Chat Area --- */
+        .chat-area {
             flex: 1;
-            background-color: #0b141a;
-            background-image: 
-                linear-gradient(rgba(11, 20, 26, 0.85), rgba(11, 20, 26, 0.85)), 
-                url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            background-repeat: repeat;
-            background-size: auto, 412px;
-            background-position: center;
             overflow-y: auto;
-            padding: 20px 5%;
+            padding: 40px 30px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 35px;
         }
 
-        .chat-body::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-body::-webkit-scrollbar-track {
-            background: #0b141a;
-        }
-
-        .chat-body::-webkit-scrollbar-thumb {
-            background: #2a3942;
-            border-radius: 3px;
-        }
+        /* Custom minimal scrollbar */
+        .chat-area::-webkit-scrollbar { width: 4px; }
+        .chat-area::-webkit-scrollbar-track { background: var(--bg); }
+        .chat-area::-webkit-scrollbar-thumb { background: #222; }
+        .chat-area::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
         .message-block {
             display: flex;
             flex-direction: column;
-            max-width: 70%;
+            max-width: 85%;
         }
 
-        .user-message {
+        .user-msg {
             align-self: flex-end;
+            text-align: right;
+            color: var(--text-muted);
         }
 
-        .xanthe-message {
+        .xanthe-msg {
             align-self: flex-start;
+            color: var(--text-main);
+            border-left: 2px solid var(--accent);
+            padding-left: 20px;
         }
 
-        .message-bubble {
-            background-color: #005c4b;
-            color: #e9edef;
-            padding: 6px 12px;
-            border-radius: 7.5px;
-            position: relative;
-            margin-bottom: 2px;
-            word-wrap: break-word;
+        .text-content {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            font-weight: 300;
+        }
+
+        .timestamp {
+            font-size: 0.65rem;
+            color: #333;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        .selfie-img {
             max-width: 100%;
-            font-size: 14.2px;
-            line-height: 19px;
-            box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
+            border-radius: 2px; /* Sharp corners */
+            margin-top: 15px;
+            opacity: 0.9;
+            filter: grayscale(20%) contrast(110%); /* Adds an edgy filter to her images */
+            transition: opacity 0.3s;
+        }
+        
+        .selfie-img:hover {
+            opacity: 1;
+            filter: none;
         }
 
-        .user-message .message-bubble {
-            background-color: #005c4b;
-            border-bottom-right-radius: 2px;
-        }
-
-        .xanthe-message .message-bubble {
-            background-color: #202c33;
-            border-bottom-left-radius: 2px;
-        }
-
-        .message-bubble::before {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border: 6px solid transparent;
-        }
-
-        .user-message .message-bubble::before {
-            right: -6px;
-            bottom: 0;
-            border-bottom-color: #005c4b;
-            border-right: 0;
-        }
-
-        .xanthe-message .message-bubble::before {
-            left: -6px;
-            bottom: 0;
-            border-bottom-color: #202c33;
-            border-left: 0;
-        }
-
-        .message-image {
-            max-width: 300px;
-            max-height: 300px;
-            border-radius: 7.5px;
-            margin-top: 4px;
-        }
-
-        .message-meta {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 4px;
-            font-size: 11px;
-            color: #8696a0;
-            margin-top: 2px;
-            padding-right: 4px;
-        }
-
-        .read-receipt {
-            width: 14px;
-            height: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .read-receipt svg {
-            width: 16px;
-            height: 16px;
-            fill: #8696a0;
-        }
-
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 8px 12px;
-            background-color: #202c33;
-            border-radius: 7.5px;
-            border-bottom-left-radius: 2px;
-            font-size: 14px;
-            color: #8696a0;
-            align-self: flex-start;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 2px;
-        }
-
-        .typing-dots span {
-            width: 6px;
-            height: 6px;
-            background-color: #8696a0;
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.4;
-            }
-            30% {
-                transform: translateY(-8px);
-                opacity: 1;
-            }
-        }
-
-        .input-container {
-            background-color: #202c33;
-            padding: 10px 5%; 
-            display: flex;
-            gap: 12px;
-            border-top: 1px solid #2a3942;
+        /* --- Input Area --- */
+        .input-area {
+            padding: 20px 30px 40px 30px;
             flex-shrink: 0;
-            align-items: center;
+            background: linear-gradient(transparent, var(--bg) 20%);
         }
 
-        .message-input {
-            flex: 1;
-            background-color: #2a3942;
-            border: none;
-            border-radius: 21px;
-            padding: 10px 16px;
-            color: #e9edef;
-            font-size: 14.9px;
-            outline: none;
-            resize: none;
-            max-height: 100px;
-            line-height: 19px;
-        }
-
-        .message-input::placeholder {
-            color: #8696a0;
-        }
-
-        .send-button {
-            width: 44px;
-            height: 44px;
-            border: none;
-            background-color: transparent;
-            cursor: pointer;
+        .input-wrapper {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+            align-items: flex-end;
+            border-bottom: 1px solid var(--text-muted);
+            padding-bottom: 10px;
+            transition: border-color 0.3s ease;
         }
 
-        .send-icon {
-            width: 24px;
-            height: 24px;
-            fill: #8696a0;
-            transition: fill 0.2s;
+        .input-wrapper:focus-within {
+            border-color: var(--accent);
         }
 
-        .send-button:hover .send-icon {
-            fill: #e9edef;
+        textarea {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 0.95rem;
+            resize: none;
+            outline: none;
+            max-height: 150px;
+            line-height: 1.5;
+            padding-right: 15px;
         }
 
-        .send-button:disabled .send-icon {
-            fill: #444;
+        textarea::placeholder {
+            color: #333;
         }
 
-        .send-button:disabled {
+        .send-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-transform: uppercase;
+            padding-bottom: 2px;
+            transition: color 0.2s;
+        }
+
+        .send-btn:hover {
+            color: #ff1a40;
+        }
+
+        .send-btn:disabled {
+            color: #333;
             cursor: not-allowed;
         }
 
-        .error-message {
-            background-color: #202c33;
-            color: #ff6b6b;
-            padding: 8px 12px;
-            border-radius: 7.5px;
-            font-size: 14px;
-            align-self: center;
-            margin: 8px 0;
+        /* Typing indicator styling */
+        .typing-text {
+            font-size: 0.85rem;
+            font-style: italic;
+            color: var(--text-muted);
+            animation: fade 1.5s infinite;
+        }
+
+        @keyframes fade {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .error-msg {
+            color: var(--accent);
+            font-size: 0.8rem;
+            text-align: center;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="chat-header">
-            <div class="avatar">X</div>
-            <div>
-                <div style="font-weight: 500; font-size: 16px;">Xanthe</div>
-                <div style="font-size: 13px; color: #8696a0;">
-                    <span id="status-indicator">online</span>
-                    <span class="status-indicator"></span>
-                </div>
+
+    <div class="container">
+        <header>
+            <div class="brand">Xanthe</div>
+            <div class="status-container">
+                <span class="status-text" id="status-text">Connected</span>
+                <div class="pulse" id="status-pulse"></div>
+            </div>
+        </header>
+
+        <div class="chat-area" id="chat-area">
+            <!-- Initial Greeting -->
+            <div class="message-block xanthe-msg">
+                <div class="text-content">So, you decided to drop the act. Good. I prefer it like this anyway. What do you want, Stacis?</div>
+                <div class="timestamp">INITIALIZED</div>
             </div>
         </div>
 
-        <div class="chat-body" id="chatBody">
-            <div class="message-block xanthe-message">
-                <div class="message-bubble">
-                    Hey there... what dangerous thoughts are swirling in that mind of yours? 😈
-                </div>
-                <div class="message-meta">
-                    <span>12:34</span>
-                </div>
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea 
+                    id="user-input" 
+                    placeholder="Enter command or message..." 
+                    rows="1"
+                ></textarea>
+                <button class="send-btn" id="send-btn">Transmit</button>
             </div>
-        </div>
-
-        <div class="input-container">
-            <textarea 
-                class="message-input" 
-                id="messageInput" 
-                placeholder="Type a message..."
-                rows="1"
-            ></textarea>
-            <button class="send-button" id="sendButton" title="Send message">
-                <svg class="send-icon" viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </button>
         </div>
     </div>
 
     <script>
-        class XantheChat {
+        class XantheDirect {
             constructor() {
-                this.chatBody = document.getElementById('chatBody');
-                this.messageInput = document.getElementById('messageInput');
-                this.sendButton = document.getElementById('sendButton');
-                this.statusIndicator = document.getElementById('status-indicator');
+                // Ensure this is your active ngrok tunnel URL
+                this.backendUrl = 'https://felica-proteinous-cynically.ngrok-free.dev/api/chat';
                 
-                this.chatHistory = [];
-                this.isTyping = false;
+                this.chatArea = document.getElementById('chat-area');
+                this.input = document.getElementById('user-input');
+                this.sendBtn = document.getElementById('send-btn');
+                this.statusText = document.getElementById('status-text');
+                this.statusPulse = document.getElementById('status-pulse');
                 
-                this.init();
+                this.history = [];
+                this.isProcessing = false;
+
+                this.setupEventListeners();
             }
 
-            init() {
-                this.sendButton.addEventListener('click', () => this.sendMessage());
-                this.messageInput.addEventListener('keydown', (e) => {
+            setupEventListeners() {
+                this.sendBtn.addEventListener('click', () => this.transmit());
+                
+                this.input.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
-                        this.sendMessage();
+                        this.transmit();
                     }
                 });
 
-                this.messageInput.addEventListener('input', this.autoResize.bind(this));
-                this.messageInput.focus();
+                // Auto-resize textarea
+                this.input.addEventListener('input', () => {
+                    this.input.style.height = 'auto';
+                    this.input.style.height = Math.min(this.input.scrollHeight, 150) + 'px';
+                });
+                
+                this.input.focus();
             }
 
-            autoResize() {
-                this.messageInput.style.height = 'auto';
-                this.messageInput.style.height = Math.min(this.messageInput.scrollHeight, 100) + 'px';
-            }
+            async transmit() {
+                const text = this.input.value.trim();
+                if (!text || this.isProcessing) return;
 
-            async sendMessage() {
-                const message = this.messageInput.value.trim();
-                if (!message || this.isTyping) return;
-
-                this.appendUserMessage(message);
-                this.messageInput.value = '';
-                this.autoResize();
-                this.setTypingStatus(true);
+                // Reset input
+                this.input.value = '';
+                this.input.style.height = 'auto';
+                
+                // Render user message
+                this.renderMessage('user', text);
+                this.history.push({ role: 'user', content: text });
+                
+                this.setProcessing(true);
 
                 try {
-                    const response = await fetch('https://felica-proteinous-cynically.ngrok-free.dev/api/chat', {
+                    const response = await fetch(this.backendUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            message: message,
-                            history: this.chatHistory
-                        })
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: text, history: this.history })
                     });
 
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error('Network Failure');
 
                     const data = await response.json();
-                    this.handleResponse(data);
+                    
+                    // Render Xanthe's response
+                    this.renderMessage('xanthe', data.reply, data.triggerSelfie ? data.imageUrl : null);
+                    this.history.push({ role: 'assistant', content: data.reply });
+
                 } catch (error) {
-                    console.error('Chat error:', error);
-                    this.appendErrorMessage('Connection failed. Server might be offline.');
+                    console.error('Transmission error:', error);
+                    this.renderError("Signal lost. Re-establish connection.");
                 } finally {
-                    this.setTypingStatus(false);
+                    this.setProcessing(false);
                 }
             }
 
-            appendUserMessage(message) {
-                const messageTime = this.formatTime(new Date());
-                const messageBlock = document.createElement('div');
-                messageBlock.className = 'message-block user-message';
-                messageBlock.innerHTML = `
-                    <div class="message-bubble">${this.escapeHtml(message)}</div>
-                    <div class="message-meta">
-                        <span>${messageTime}</span>
-                        <div class="read-receipt">
-                            <svg viewBox="0 0 16 16">
-                                <path d="M10.91 3.316L6.25 8.079l-1.91-1.9L3 6.37l3.25 3.22L13 4.112z"/>
-                                <path fill-opacity=".3" d="M10.91 3.316L6.25 8.079l-1.91-1.9L3 6.37l3.25 3.22L13 4.112z"/>
-                            </svg>
-                        </div>
-                    </div>
-                `;
-                this.chatBody.appendChild(messageBlock);
-                this.scrollToBottom();
-                this.chatHistory.push({ role: 'user', content: message });
-            }
+            renderMessage(role, text, imageUrl = null) {
+                const block = document.createElement('div');
+                block.className = `message-block ${role}-msg`;
 
-            handleResponse(data) {
-                if (data.reply) {
-                    this.appendXantheMessage(data.reply, data.imageUrl || null);
-                    this.chatHistory.push({ role: 'assistant', content: data.reply });
-                }
-            }
-
-            appendXantheMessage(message, imageUrl) {
-                const messageTime = this.formatTime(new Date());
-                const messageBlock = document.createElement('div');
-                messageBlock.className = 'message-block xanthe-message';
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
-                let imageHtml = '';
+                let imgHtml = '';
                 if (imageUrl) {
-                    imageHtml = `<br><img src="${imageUrl}" alt="Xanthe selfie" class="message-image" onerror="this.style.display='none'">`;
+                    imgHtml = `<img src="${imageUrl}" class="selfie-img" alt="Visual Data" onerror="this.style.display='none'">`;
                 }
 
-                messageBlock.innerHTML = `
-                    <div class="message-bubble">${this.escapeHtml(message)}${imageHtml}</div>
-                    <div class="message-meta">
-                        <span>${messageTime}</span>
-                    </div>
+                block.innerHTML = `
+                    <div class="text-content">${this.escapeHtml(text)}</div>
+                    ${imgHtml}
+                    <div class="timestamp">${time}</div>
                 `;
-                this.chatBody.appendChild(messageBlock);
+
+                this.chatArea.appendChild(block);
                 this.scrollToBottom();
             }
 
-            appendErrorMessage(message) {
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                errorDiv.textContent = message;
-                this.chatBody.appendChild(errorDiv);
+            renderError(text) {
+                const block = document.createElement('div');
+                block.className = `error-msg`;
+                block.innerText = text;
+                this.chatArea.appendChild(block);
                 this.scrollToBottom();
             }
 
-            setTypingStatus(typing) {
-                this.isTyping = typing;
-                this.sendButton.disabled = typing;
+            setProcessing(state) {
+                this.isProcessing = state;
+                this.sendBtn.disabled = state;
                 
-                if (typing) {
-                    this.statusIndicator.textContent = 'typing...';
-                    this.showTypingIndicator();
+                if (state) {
+                    this.statusText.innerText = 'Receiving...';
+                    this.statusPulse.style.backgroundColor = '#555';
+                    this.statusPulse.style.boxShadow = 'none';
+                    this.showTyping();
                 } else {
-                    this.statusIndicator.textContent = 'online';
-                    this.hideTypingIndicator();
+                    this.statusText.innerText = 'Connected';
+                    this.statusPulse.style.backgroundColor = 'var(--accent)';
+                    this.statusPulse.style.boxShadow = '0 0 10px var(--accent)';
+                    this.hideTyping();
                 }
             }
 
-            showTypingIndicator() {
-                const typingDiv = document.createElement('div');
-                typingDiv.id = 'typing-indicator';
-                typingDiv.className = 'typing-indicator';
-                typingDiv.innerHTML = `
-                    <div>Xanthe</div>
-                    <div class="typing-dots">
-                        <span></span><span></span><span></span>
-                    </div>
-                `;
-                this.chatBody.appendChild(typingDiv);
+            showTyping() {
+                const indicator = document.createElement('div');
+                indicator.id = 'typing-indicator';
+                indicator.className = 'message-block xanthe-msg';
+                indicator.innerHTML = `<div class="typing-text">Xanthe is typing...</div>`;
+                this.chatArea.appendChild(indicator);
                 this.scrollToBottom();
             }
 
-            hideTypingIndicator() {
-                const typingIndicator = document.getElementById('typing-indicator');
-                if (typingIndicator) {
-                    typingIndicator.remove();
-                }
+            hideTyping() {
+                const indicator = document.getElementById('typing-indicator');
+                if (indicator) indicator.remove();
             }
 
             scrollToBottom() {
-                this.chatBody.scrollTop = this.chatBody.scrollHeight;
+                this.chatArea.scrollTop = this.chatArea.scrollHeight;
             }
 
-            formatTime(date) {
-                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            }
-
-            escapeHtml(text) {
+            escapeHtml(str) {
                 const div = document.createElement('div');
-                div.textContent = text;
+                div.textContent = str;
                 return div.innerHTML;
             }
         }
 
-        // Initialize chat when DOM is loaded
+        // Boot up
         document.addEventListener('DOMContentLoaded', () => {
-            new XantheChat();
+            new XantheDirect();
         });
     </script>
 </body>
