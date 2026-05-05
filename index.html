@@ -3,141 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xanthe Interface</title>
+    <title>WhatsApp - Xanthe</title>
     <style>
         :root {
-            --bg-color: #0d0d0d;
-            --chat-bg: #1a1a1a;
-            --accent-red: #cc0000;
-            --text-main: #e0e0e0;
-            --text-muted: #888888;
+            --app-bg: #111b21;
+            --chat-bg: #0b141a;
+            --panel-header: #202c33;
+            --msg-in: #202c33;
+            --msg-out: #005c4b;
+            --text-main: #e9edef;
+            --text-muted: #8696a0;
+            --input-bg: #2a3942;
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--app-bg);
             margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
             height: 100vh;
+            color: var(--text-main);
         }
 
         #app-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             display: flex;
             flex-direction: column;
             background-color: var(--chat-bg);
-            border-left: 1px solid #333;
-            border-right: 1px solid #333;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            position: relative;
         }
 
+        /* --- HEADER --- */
         #header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-            font-weight: bold;
-            color: var(--accent-red);
-            letter-spacing: 2px;
+            background-color: var(--panel-header);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
         }
 
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1a1a1a, #4a0000); /* Edgy placeholder */
+            object-fit: cover;
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .contact-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .contact-status {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* --- CHAT AREA --- */
         #chat-box {
             flex-grow: 1;
-            padding: 20px;
+            padding: 20px 5%;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 8px;
+            /* Classic WA dark background pattern */
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+            background-size: contain;
         }
 
         .message {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 4px;
-            line-height: 1.4;
+            max-width: 65%;
+            padding: 6px 7px 8px 9px;
+            border-radius: 7.5px;
+            font-size: 14.2px;
+            line-height: 19px;
+            position: relative;
             word-wrap: break-word;
+            box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
         }
 
         .user-msg {
             align-self: flex-end;
-            background-color: #262626;
-            color: #fff;
-            border-right: 3px solid #555;
+            background-color: var(--msg-out);
+            border-top-right-radius: 0;
         }
 
         .xanthe-msg {
             align-self: flex-start;
-            background-color: #111;
-            color: var(--text-main);
-            border-left: 3px solid var(--accent-red);
+            background-color: var(--msg-in);
+            border-top-left-radius: 0;
         }
 
         .selfie-img {
             max-width: 100%;
-            border-radius: 4px;
-            margin-top: 10px;
-            border: 1px solid var(--accent-red);
+            border-radius: 6px;
+            margin-top: 4px;
+            display: block;
         }
 
+        .typing-indicator {
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        /* --- INPUT AREA --- */
         #input-container {
+            background-color: var(--panel-header);
+            padding: 10px 16px;
             display: flex;
-            padding: 15px;
-            background-color: var(--bg-color);
-            border-top: 1px solid #333;
+            align-items: center;
+            gap: 12px;
         }
 
         #user-input {
             flex-grow: 1;
-            background-color: #1a1a1a;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 12px;
+            background-color: var(--input-bg);
+            border: none;
+            border-radius: 8px;
+            color: var(--text-main);
+            padding: 9px 12px;
+            font-size: 15px;
             font-family: inherit;
             outline: none;
         }
 
-        #user-input:focus {
-            border-color: var(--accent-red);
+        #user-input::placeholder {
+            color: var(--text-muted);
         }
 
         #send-btn {
-            background-color: var(--accent-red);
-            color: #fff;
+            background: transparent;
             border: none;
-            padding: 0 20px;
-            margin-left: 10px;
             cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-            transition: background 0.2s;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        #send-btn:hover {
-            background-color: #ff0000;
+        /* Simple SVG Send Icon */
+        #send-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-muted);
+            transition: fill 0.2s;
         }
+
+        #send-btn:hover svg {
+            fill: var(--text-main);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
     </style>
 </head>
 <body>
 
     <div id="app-container">
-        <div id="header">XANTHE // TERMINAL</div>
+        <!-- HEADER -->
+        <div id="header">
+            <div class="avatar"></div>
+            <div class="header-info">
+                <div class="contact-name">Xanthe</div>
+                <div class="contact-status">online</div>
+            </div>
+        </div>
+
+        <!-- CHAT AREA -->
         <div id="chat-box"></div>
         
+        <!-- INPUT AREA -->
         <div id="input-container">
-            <input type="text" id="user-input" placeholder="Type something..." autocomplete="off">
-            <button id="send-btn">SEND</button>
+            <input type="text" id="user-input" placeholder="Type a message" autocomplete="off">
+            <button id="send-btn">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
         </div>
     </div>
 
     <script>
-        // Permanent Ngrok Tunnel URL connected to your local port 3000
+        // Your Ngrok Tunnel
         const BACKEND_URL = "https://felica-proteinous-cynically.ngrok-free.dev/api/chat"; 
 
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
         const sendBtn = document.getElementById('send-btn');
+        const statusText = document.querySelector('.contact-status');
 
         let chatHistory = [];
 
@@ -151,7 +220,7 @@
                 const img = document.createElement('img');
                 img.src = imageUrl;
                 img.classList.add('selfie-img');
-                img.alt = "Xanthe Selfie";
+                img.alt = "Attached Photo";
                 msgDiv.appendChild(img);
             }
 
@@ -166,13 +235,7 @@
             addMessage('user', text);
             userInput.value = '';
             
-            // Temporary typing indicator
-            const typingDiv = document.createElement('div');
-            typingDiv.classList.add('message', 'xanthe-msg');
-            typingDiv.id = 'typing-indicator';
-            typingDiv.innerText = "...";
-            chatBox.appendChild(typingDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            statusText.innerText = "typing...";
 
             try {
                 const response = await fetch(BACKEND_URL, {
@@ -181,16 +244,12 @@
                     body: JSON.stringify({ message: text, history: chatHistory })
                 });
 
-                if (!response.ok) throw new Error("Server response was not ok.");
+                if (!response.ok) throw new Error("Network error");
 
                 const data = await response.json();
                 
-                // Remove typing indicator
-                document.getElementById('typing-indicator').remove();
-
-                // If the backend generates an image, it will pass the URL here
+                statusText.innerText = "online";
                 const imageUrl = data.triggerSelfie ? data.imageUrl : null; 
-
                 addMessage('xanthe', data.reply, imageUrl);
 
                 chatHistory.push({ role: 'user', content: text });
@@ -198,8 +257,8 @@
 
             } catch (error) {
                 console.error("Error:", error);
-                document.getElementById('typing-indicator').remove();
-                addMessage('xanthe', "[Connection to Xanthe lost. Server might be down.]");
+                statusText.innerText = "offline";
+                addMessage('xanthe', "...");
             }
         }
 
