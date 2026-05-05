@@ -3,61 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp - Xanthe</title>
+    <title>Xanthe Chat - WhatsApp View</title>
     <style>
         :root {
-            --app-bg: #111b21;
-            --chat-bg: #0b141a;
-            --panel-header: #202c33;
-            --msg-in: #202c33;
-            --msg-out: #005c4b;
-            --text-main: #e9edef;
-            --text-muted: #8696a0;
-            --input-bg: #2a3942;
+            /* WhatsApp Dark Mode Colors */
+            --wa-bg-color: #111b21;
+            --wa-header-color: #202c33;
+            --wa-chat-bg-color: #0b141a;
+            --wa-bubble-in-color: #202c33;
+            --wa-bubble-out-color: #005c4b;
+            --wa-text-color: #e9edef;
+            --wa-sub-text-color: #8696a0;
+            --wa-input-bg-color: #2a3942;
+            --wa-accent-color: #00a884;
+            /* Xanthe's Persona-specific Avatar Color */
+            --xanthe-avatar: linear-gradient(135deg, #1a1a1a 0%, #4a0000 100%);
         }
 
         body {
             font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--app-bg);
+            background-color: var(--wa-bg-color);
             margin: 0;
             display: flex;
             justify-content: center;
+            align-items: center;
             height: 100vh;
-            color: var(--text-main);
+            color: var(--wa-text-color);
         }
 
-        #app-container {
+        /* Full page centering wrapper */
+        .page-container {
             width: 100%;
-            max-width: 800px;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* The limited-width chat wrapper (like a WhatsApp chat window) */
+        .chat-wrapper {
+            width: 100%;
+            max-width: 650px;
+            height: 100%;
+            max-height: 800px;
             display: flex;
             flex-direction: column;
-            background-color: var(--chat-bg);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            position: relative;
+            background-color: var(--wa-chat-bg-color);
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+            overflow: hidden;
+            border-radius: 8px; /* Slight rounding for the chat window */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
 
-        /* --- HEADER --- */
-        #header {
-            background-color: var(--panel-header);
+        /* --- Chat Header --- */
+        .chat-header {
+            background-color: var(--wa-header-color);
             padding: 10px 16px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: space-between;
             z-index: 10;
         }
 
-        .avatar {
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #1a1a1a, #4a0000); /* Edgy placeholder */
-            object-fit: cover;
+            background: var(--xanthe-avatar); /* Xanthe's custom avatar from original image */
+            margin-right: 15px;
         }
 
-        .header-info {
+        .contact-info {
             display: flex;
             flex-direction: column;
-            justify-content: center;
         }
 
         .contact-name {
@@ -67,23 +91,38 @@
 
         .contact-status {
             font-size: 13px;
-            color: var(--text-muted);
+            color: var(--wa-accent-color);
             margin-top: 2px;
         }
 
-        /* --- CHAT AREA --- */
-        #chat-box {
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-icon {
+            color: var(--wa-sub-text-color);
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            fill: currentcolor;
+        }
+
+        /* --- Chat Body (Patterned) --- */
+        .chat-body {
             flex-grow: 1;
-            padding: 20px 5%;
             overflow-y: auto;
+            padding: 20px;
+            background-color: var(--wa-chat-bg-color);
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Public WhatsApp Dark Doodle Pattern */
+            background-size: cover;
             display: flex;
             flex-direction: column;
             gap: 8px;
-            /* Classic WA dark background pattern */
-            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
-            background-size: contain;
         }
 
+        /* --- Message Bubbles --- */
         .message {
             max-width: 65%;
             padding: 6px 7px 8px 9px;
@@ -95,177 +134,205 @@
             box-shadow: 0 1px 0.5px rgba(11,20,26,.13);
         }
 
-        .user-msg {
+        /* Add bubble tails */
+        .message::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        /* Outgoing message (You / green) */
+        .msg-out {
             align-self: flex-end;
-            background-color: var(--msg-out);
+            background-color: var(--wa-bubble-out-color);
             border-top-right-radius: 0;
         }
 
-        .xanthe-msg {
+        .msg-out::after {
+            top: 0;
+            right: -7.5px;
+            border-width: 8px 0 8px 8px;
+            border-color: transparent transparent transparent var(--wa-bubble-out-color);
+        }
+
+        /* Incoming message (Xanthe / dark gray) */
+        .msg-in {
             align-self: flex-start;
-            background-color: var(--msg-in);
+            background-color: var(--wa-bubble-in-color);
             border-top-left-radius: 0;
         }
 
-        .selfie-img {
+        .msg-in::after {
+            top: 0;
+            left: -7.5px;
+            border-width: 8px 8px 8px 0;
+            border-color: transparent var(--wa-bubble-in-color) transparent transparent;
+        }
+
+        /* Date Separator */
+        .date-separator {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 13px;
+            color: var(--wa-sub-text-color);
+        }
+
+        /* Content inside bubbles (links, images, etc.) */
+        .message .meta {
+            font-size: 11px;
+            color: var(--wa-sub-text-color);
+            position: absolute;
+            bottom: 3px;
+            right: 7px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .check-marks {
+            width: 14px;
+            height: 14px;
+            fill: var(--wa-sub-text-color); /* Gray checks */
+        }
+
+        .message a {
+            color: var(--wa-accent-color);
+            text-decoration: none;
+        }
+
+        /* Simple image in a message example (like in the prompt) */
+        .message img {
             max-width: 100%;
             border-radius: 6px;
             margin-top: 4px;
             display: block;
         }
 
-        .typing-indicator {
-            font-style: italic;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        /* --- INPUT AREA --- */
-        #input-container {
-            background-color: var(--panel-header);
+        /* --- Chat Input Bar --- */
+        .chat-input-bar {
+            background-color: var(--wa-header-color);
             padding: 10px 16px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 12px;
         }
 
-        #user-input {
-            flex-grow: 1;
-            background-color: var(--input-bg);
+        .input-icon-btn {
+            background: none;
             border: none;
-            border-radius: 8px;
-            color: var(--text-main);
+            color: var(--wa-sub-text-color);
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            fill: currentcolor;
+        }
+
+        .chat-input-bar input {
+            flex-grow: 1;
+            background-color: var(--wa-input-bg-color);
+            border: none;
+            border-radius: 20px;
+            color: var(--wa-text-color);
             padding: 9px 12px;
             font-size: 15px;
             font-family: inherit;
+        }
+
+        .chat-input-bar input::placeholder {
+            color: var(--wa-sub-text-color);
+        }
+
+        .chat-input-bar input:focus {
             outline: none;
         }
 
-        #user-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        #send-btn {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Simple SVG Send Icon */
-        #send-btn svg {
-            width: 24px;
-            height: 24px;
-            fill: var(--text-muted);
-            transition: fill 0.2s;
-        }
-
-        #send-btn:hover svg {
-            fill: var(--text-main);
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
     </style>
 </head>
 <body>
 
-    <div id="app-container">
-        <!-- HEADER -->
-        <div id="header">
-            <div class="avatar"></div>
-            <div class="header-info">
-                <div class="contact-name">Xanthe</div>
-                <div class="contact-status">online</div>
-            </div>
-        </div>
+    <div class="page-container">
+        <div class="chat-wrapper">
+            <!-- Header -->
+            <header class="chat-header">
+                <div class="header-left">
+                    <div class="contact-avatar"></div>
+                    <div class="contact-info">
+                        <span class="contact-name">Xanthe</span>
+                        <span class="contact-status">online</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <svg class="header-icon" viewBox="0 0 24 24"><path d="M15.9 14.3h-.8l-.3-.3a6.6 6.6 0 10-.7.7l.3.3v.8l5.1 5 1.5-1.5-5.1-5zm-6.1 0a4.3 4.3 0 110-8.6 4.3 4.3 0 010 8.6z"></path></svg>
+                    <svg class="header-icon" viewBox="0 0 24 24"><path d="M12 8a2 2 0 100-4 2 2 0 000 4zm0 6a2 2 0 100-4 2 2 0 000 4zm0 6a2 2 0 100-4 2 2 0 000 4z"></path></svg>
+                </div>
+            </header>
 
-        <!-- CHAT AREA -->
-        <div id="chat-box"></div>
-        
-        <!-- INPUT AREA -->
-        <div id="input-container">
-            <input type="text" id="user-input" placeholder="Type a message" autocomplete="off">
-            <button id="send-btn">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </button>
+            <!-- Chat Body -->
+            <div class="chat-body">
+                <div class="date-separator">Yesterday</div>
+
+                <!-- Example User Message -->
+                <div class="message msg-out">
+                    <span>What should the persona system prompt be for Xanthe, contrasting from Nyelle?</span>
+                    <div class="meta">
+                        <span>22:41</span>
+                        <svg class="check-marks" viewBox="0 0 18 18"><path d="M11.603 5.42L12.31 6.128 7.31 11.128 5.693 9.51 6.398 8.803 7.31 9.715l4.293-4.295zM11.603 9.42L12.31 10.128 7.31 15.128 5.693 13.51 6.398 12.803 7.31 13.715l4.293-4.295z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Example Xanthe Message (Text only) -->
+                <div class="message msg-in">
+                    <span>You tell me, Stacis. How 'dangerous' do you want me to be? 😉</span>
+                    <div class="meta">
+                        <span>22:43</span>
+                    </div>
+                </div>
+
+                <div class="date-separator">Saturday</div>
+
+                <!-- Example User Message (Server up) -->
+                <div class="message msg-out">
+                    <span>🚀 Server is up on port 3000, Stacis. Let me know when you've locked in that ngrok tunnel URL!</span>
+                    <div class="meta">
+                        <span>21:06</span>
+                        <svg class="check-marks" viewBox="0 0 18 18"><path d="M11.603 5.42L12.31 6.128 7.31 11.128 5.693 9.51 6.398 8.803 7.31 9.715l4.293-4.295zM11.603 9.42L12.31 10.128 7.31 15.128 5.693 13.51 6.398 12.803 7.31 13.715l4.293-4.295z"></path></svg>
+                    </div>
+                </div>
+
+                <!-- Example Xanthe Message (Text with image link) -->
+                <div class="message msg-in">
+                    <span>Nice work, you actually did it. <a href="https://felica-proteinous-cynically.ngrok-free.dev" target="_blank">Here's a link to the interface</a>, Stacis. Don't make me wait.</span>
+                    <div class="meta">
+                        <span>11:39</span>
+                    </div>
+                </div>
+
+                <!-- Example Xanthe Message (Mock Image she's sent) -->
+                <div class="message msg-in">
+                    <img src="https://i.ibb.co/L5k6nK1/Manga-Style-Dangerous-Companion.png" alt="Mock image from Xanthe">
+                    <div class="meta">
+                        <span>11:45</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Input Bar -->
+            <footer class="chat-input-bar">
+                <button class="input-icon-btn">
+                    <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+                </button>
+                <input type="text" placeholder="Type a message" />
+                <button class="input-icon-btn">
+                    <svg viewBox="0 0 24 24"><path d="M11.999 14.942c2.001 0 3.531-1.53 3.531-3.531V4.35c0-2.001-1.53-3.531-3.531-3.531S8.469 2.35 8.469 4.35v7.061c0 2.001 1.53 3.531 3.53 3.531zm6.238-3.53c0 3.531-2.942 6.002-6.237 6.002s-6.237-2.471-6.237-6.002H3.761c0 4.001 3.178 7.414 7.061 7.944v3.944h2.353v-3.944c3.884-.53 7.061-3.943 7.061-7.944h-2.001z"></path></svg>
+                </button>
+            </footer>
         </div>
     </div>
 
-    <script>
-        // Your Ngrok Tunnel
-        const BACKEND_URL = "https://felica-proteinous-cynically.ngrok-free.dev/api/chat"; 
-
-        const chatBox = document.getElementById('chat-box');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
-        const statusText = document.querySelector('.contact-status');
-
-        let chatHistory = [];
-
-        function addMessage(role, text, imageUrl = null) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message');
-            msgDiv.classList.add(role === 'user' ? 'user-msg' : 'xanthe-msg');
-            msgDiv.innerText = text;
-
-            if (imageUrl) {
-                const img = document.createElement('img');
-                img.src = imageUrl;
-                img.classList.add('selfie-img');
-                img.alt = "Attached Photo";
-                msgDiv.appendChild(img);
-            }
-
-            chatBox.appendChild(msgDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            addMessage('user', text);
-            userInput.value = '';
-            
-            statusText.innerText = "typing...";
-
-            try {
-                const response = await fetch(BACKEND_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, history: chatHistory })
-                });
-
-                if (!response.ok) throw new Error("Network error");
-
-                const data = await response.json();
-                
-                statusText.innerText = "online";
-                const imageUrl = data.triggerSelfie ? data.imageUrl : null; 
-                addMessage('xanthe', data.reply, imageUrl);
-
-                chatHistory.push({ role: 'user', content: text });
-                chatHistory.push({ role: 'assistant', content: data.reply });
-
-            } catch (error) {
-                console.error("Error:", error);
-                statusText.innerText = "offline";
-                addMessage('xanthe', "...");
-            }
-        }
-
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-    </script>
 </body>
 </html>
