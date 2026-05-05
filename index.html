@@ -3,71 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xanthe // Terminal</title>
+    <title>Xanthe Interface</title>
     <style>
-        :root { --accent: #ff0055; --bg: #0a0a0a; --text: #e0e0e0; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; flex-direction: column; height: 100vh; margin: 0; }
-        #chat-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg { max-width: 80%; padding: 12px; border-radius: 8px; line-height: 1.4; }
-        .user { align-self: flex-end; background: #222; border-right: 3px solid var(--accent); }
-        .xanthe { align-self: flex-start; background: #1a1a1a; border-left: 3px solid var(--accent); }
-        .selfie { width: 100%; max-width: 300px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--accent); }
-        #input-area { padding: 20px; background: #111; display: flex; gap: 10px; }
-        input { flex: 1; background: #000; border: 1px solid #333; color: white; padding: 12px; outline: none; }
-        input:focus { border-color: var(--accent); }
-        button { background: var(--accent); color: white; border: none; padding: 0 20px; cursor: pointer; font-weight: bold; }
+        :root {
+            --bg-color: #0d0d0d;
+            --chat-bg: #1a1a1a;
+            --accent-red: #cc0000;
+            --text-main: #e0e0e0;
+            --text-muted: #888888;
+        }
+
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+            border-left: 1px solid #333;
+            border-right: 1px solid #333;
+        }
+
+        #header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            font-weight: bold;
+            color: var(--accent-red);
+            letter-spacing: 2px;
+        }
+
+        #chat-box {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 4px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .user-msg {
+            align-self: flex-end;
+            background-color: #262626;
+            color: #fff;
+            border-right: 3px solid #555;
+        }
+
+        .xanthe-msg {
+            align-self: flex-start;
+            background-color: #111;
+            color: var(--text-main);
+            border-left: 3px solid var(--accent-red);
+        }
+
+        .selfie-img {
+            max-width: 100%;
+            border-radius: 4px;
+            margin-top: 10px;
+            border: 1px solid var(--accent-red);
+        }
+
+        #input-container {
+            display: flex;
+            padding: 15px;
+            background-color: var(--bg-color);
+            border-top: 1px solid #333;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            color: #fff;
+            padding: 12px;
+            font-family: inherit;
+            outline: none;
+        }
+
+        #user-input:focus {
+            border-color: var(--accent-red);
+        }
+
+        #send-btn {
+            background-color: var(--accent-red);
+            color: #fff;
+            border: none;
+            padding: 0 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        #send-btn:hover {
+            background-color: #ff0000;
+        }
     </style>
 </head>
 <body>
-    <div id="chat-container"></div>
-    <div id="input-area">
-        <input type="text" id="user-input" placeholder="Say something dangerous...">
-        <button onclick="sendMessage()">SEND</button>
+
+    <div id="app-container">
+        <div id="header">XANTHE // TERMINAL</div>
+        <div id="chat-box"></div>
+        
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Type something..." autocomplete="off">
+            <button id="send-btn">SEND</button>
+        </div>
     </div>
 
     <script>
-        const chatContainer = document.getElementById('chat-container');
-        let history = [];
+        // --- IMPORTANT: Update this URL when you run ngrok/localtunnel ---
+        // GitHub Pages uses HTTPS, so you CANNOT use http://localhost:3000 here.
+        // You must use an HTTPS tunnel URL that points to your local server.
+        const BACKEND_URL = "https://YOUR_TUNNEL_URL.ngrok.app/api/chat"; 
+
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        let chatHistory = [];
+
+        function addMessage(role, text, imageUrl = null) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message');
+            msgDiv.classList.add(role === 'user' ? 'user-msg' : 'xanthe-msg');
+            msgDiv.innerText = text;
+
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.classList.add('selfie-img');
+                img.alt = "Xanthe Selfie";
+                msgDiv.appendChild(img);
+            }
+
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
         async function sendMessage() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
+            const text = userInput.value.trim();
             if (!text) return;
 
-            appendMessage('user', text);
-            input.value = '';
+            addMessage('user', text);
+            userInput.value = '';
+            
+            // Temporary typing indicator
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('message', 'xanthe-msg');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerText = "...";
+            chatBox.appendChild(typingDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
 
             try {
-                // Change this to your Ngrok URL or local IP later
-                const response = await fetch('https://sad-shrimps-wear.loca.lt/chat', {
+                const response = await fetch(BACKEND_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, history: history })
+                    body: JSON.stringify({ message: text, history: chatHistory })
                 });
 
+                if (!response.ok) throw new Error("Server response was not ok.");
+
                 const data = await response.json();
-                appendMessage('xanthe', data.reply, data.triggerSelfie ? 'https://via.placeholder.com/300?text=Generating+Selfie...' : null);
                 
-                history.push({ role: 'user', content: text });
-                history.push({ role: 'assistant', content: data.reply });
-            } catch (err) {
-                appendMessage('xanthe', "Server's dead, Stacis. Fix it.");
+                // Remove typing indicator
+                document.getElementById('typing-indicator').remove();
+
+                // If your backend eventually generates an image, it should return the image URL
+                // For now, if triggerSelfie is true, we can pass a placeholder or null
+                const imageUrl = data.triggerSelfie ? data.imageUrl : null; 
+
+                addMessage('xanthe', data.reply, imageUrl);
+
+                chatHistory.push({ role: 'user', content: text });
+                chatHistory.push({ role: 'assistant', content: data.reply });
+
+            } catch (error) {
+                console.error("Error:", error);
+                document.getElementById('typing-indicator').remove();
+                addMessage('xanthe', "[Connection to Xanthe lost.]");
             }
         }
 
-        function appendMessage(role, text, imgUrl = null) {
-            const div = document.createElement('div');
-            div.className = `msg ${role}`;
-            div.innerText = text;
-            if (imgUrl) {
-                const img = document.createElement('img');
-                img.src = imgUrl;
-                img.className = 'selfie';
-                div.appendChild(img);
-            }
-            chatContainer.appendChild(div);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
     </script>
 </body>
 </html>
