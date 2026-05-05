@@ -132,11 +132,8 @@
     </div>
 
     <script>
-        // --- IMPORTANT: Update this URL when you run ngrok/localtunnel ---
-        // GitHub Pages uses HTTPS, so you CANNOT use http://localhost:3000 here.
-        // You must use an HTTPS tunnel URL that points to your local server.
-        // --- IMPORTANT: Update this URL when you run ngrok/localtunnel ---
-const BACKEND_URL = "https://clear-lights-search.loca.lt/api/chat"; 
+        // Permanent Ngrok Tunnel URL connected to your local port 3000
+        const BACKEND_URL = "https://felica-proteinous-cynically.ngrok-free.dev/api/chat"; 
 
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
@@ -191,8 +188,7 @@ const BACKEND_URL = "https://clear-lights-search.loca.lt/api/chat";
                 // Remove typing indicator
                 document.getElementById('typing-indicator').remove();
 
-                // If your backend eventually generates an image, it should return the image URL
-                // For now, if triggerSelfie is true, we can pass a placeholder or null
+                // If the backend generates an image, it will pass the URL here
                 const imageUrl = data.triggerSelfie ? data.imageUrl : null; 
 
                 addMessage('xanthe', data.reply, imageUrl);
@@ -203,7 +199,7 @@ const BACKEND_URL = "https://clear-lights-search.loca.lt/api/chat";
             } catch (error) {
                 console.error("Error:", error);
                 document.getElementById('typing-indicator').remove();
-                addMessage('xanthe', "[Connection to Xanthe lost.]");
+                addMessage('xanthe', "[Connection to Xanthe lost. Server might be down.]");
             }
         }
 
