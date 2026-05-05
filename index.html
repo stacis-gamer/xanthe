@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <title>Chat with Xanthe</title>
+    <style>
+        /* WhatsApp Dark Mode Colors */
+        :root {
+            --bg-body: #111b21;
+            --bg-panel: #202c33;
+            --bg-chat: #0b141a;
+            --text-main: #e9edef;
+            --text-muted: #8696a0;
+            --bubble-out: #005c4b;
+            --bubble-in: #202c33;
+            --accent: #00a884;
+        }
+
+        body, html {
+            margin: 0; padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+        }
+
+        /* Layout */
+        .sidebar {
+            width: 30%;
+            background-color: var(--bg-body);
+            border-right: 1px solid #222d34;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-chat {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-chat);
+            background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); /* Subtle WA pattern */
+            background-size: cover;
+        }
+
+        /* Headers */
+        .header {
+            height: 60px;
+            background-color: var(--bg-panel);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+        }
+        .avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        
+        /* Chat Area */
+        .chat-history {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .message {
+            max-width: 65%;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-size: 14.5px;
+            line-height: 19px;
+            word-wrap: break-word;
+        }
+        .message.sent {
+            align-self: flex-end;
+            background-color: var(--bubble-out);
+            border-top-right-radius: 0;
+        }
+        .message.received {
+            align-self: flex-start;
+            background-color: var(--bubble-in);
+            border-top-left-radius: 0;
+        }
+        .message img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 5px;
+        }
+
+        /* Input Area */
+        .input-area {
+            height: 62px;
+            background-color: var(--bg-panel);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 10px;
+        }
+        .input-area input {
+            flex: 1;
+            background-color: #2a3942;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: var(--text-main);
+            font-size: 15px;
+            outline: none;
+        }
+        .send-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .send-btn:hover { color: var(--accent); }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar (Fake UI for aesthetics) -->
+    <div class="sidebar">
+        <div class="header">
+            <img src="https://ui-avatars.com/api/?name=Stacis&background=0D8ABC&color=fff" class="avatar" alt="You">
+            <span style="font-weight: 500;">Chats</span>
+        </div>
+        <div style="padding: 15px; border-bottom: 1px solid #222d34; display: flex; align-items: center;">
+            <img src="https://ui-avatars.com/api/?name=Xanthe&background=8B0000&color=fff" class="avatar" alt="Xanthe">
+            <div>
+                <div style="font-weight: 500;">Xanthe</div>
+                <div style="font-size: 13px; color: var(--text-muted);">ugh, whatever.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chat Window -->
+    <div class="main-chat">
+        <div class="header">
+            <img src="https://ui-avatars.com/api/?name=Xanthe&background=8B0000&color=fff" class="avatar" alt="Xanthe">
+            <span style="font-weight: 500;">Xanthe</span>
+        </div>
+        
+        <div class="chat-history" id="chat-box">
+            <!-- Messages go here -->
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type a message" onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // REPLACE THIS WITH YOUR NGROK URL ONCE THE FLASK SERVER IS RUNNING
+        const BACKEND_URL = "https://your-ngrok-url.app/chat"; 
+        
+        let chatHistory = [];
+
+        function appendMessage(text, isSent, imageUrl = null) {
+            const chatBox = document.getElementById('chat-box');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            
+            let content = `<span>${text}</span>`;
+            if (imageUrl) {
+                content += `<br><img src="${imageUrl}" alt="Selfie">`;
+            }
+            
+            msgDiv.innerHTML = content;
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+        }
+
+        async function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            // 1. Show User Message
+            appendMessage(text, true);
+            inputField.value = '';
+
+            // 2. Add to history payload
+            chatHistory.push({ role: "USER", content: text });
+
+            // 3. Send to Flask Backend
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, history: chatHistory })
+                });
+
+                const data = await response.json();
+
+                // 4. Update UI with Xanthe's response
+                if (data.reply) {
+                    appendMessage(data.reply, false, data.image_url);
+                    chatHistory.push({ role: "ASSISTANT", content: data.reply });
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                appendMessage("❌ Connection error. Is the backend and Ngrok running?", false);
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') sendMessage();
+        }
+    </script>
+</body>
+</html>
